@@ -1,6 +1,4 @@
 // src/components/Protected.tsx
-import restoreSession;
-import fetchMe;
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { restoreSession, fetchMe } from "@/lib/auth";

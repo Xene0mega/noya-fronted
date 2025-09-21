@@ -1,5 +1,5 @@
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -38,22 +38,60 @@ function StatusBadge({ status }: { status: string }) {
 export default function Precommandes() {
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <div>
+      {/* règles: paysage 6" + desktop centré, sans toucher au Layout */}
+      <style>{`
+        /* ---- Mobile paysage (~6") ---- */
+        @media (orientation: landscape) and (max-width: 920px) {
+          .ls-page {
+            max-width: 92vw !important;
+            margin-left: auto; margin-right: auto;
+            display: flex; flex-direction: column; align-items: center;
+          }
+             .ls-header {
+      text-align: left !important;
+      margin-left: -270px !important;
+      padding-left: 0 !important;
+    }
+
+    
+          .ls-card { width: 100%; max-width: 100vw !important; }
+          .ls-tablewrap {
+            margin-left: -12px !important; margin-right: -12px !important;
+            padding-left: 12px !important; padding-right: 12px !important;
+          }
+          .ls-tablewrap > * { max-width: 100% !important; }
+        }
+
+        /* ---- Desktop : largeur contenue et centrée (comme Rapports/Index) ---- */
+        @media (min-width: 1024px) {
+          .desk-wrap {
+            max-width: min(1100px, 72vw);  /* largeur douce ~ Rapports */
+            margin-left: auto; margin-right: auto;
+          }
+          .desk-tablewrap { margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+        }
+      `}</style>
+
+      {/* container principal : suit AppLayout -> ajoute nos classes utilitaires */}
+      <div className="space-y-6 ls-page desk-wrap">
+        {/* Titre */}
+        <div className="ls-header">
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Précommandes</h1>
           <p className="text-sm sm:text-base text-muted-foreground">Gestion des précommandes de la chaîne de distribution</p>
         </div>
 
-        <Card>
+        {/* Carte centrée */}
+        <Card className="w-full mx-auto ls-card">
           <CardHeader className="pb-3">
             <CardTitle>Liste des Précommandes</CardTitle>
             <CardDescription>Précommandes reçues et leur statut de traitement</CardDescription>
           </CardHeader>
+
           <CardContent>
-            {/* Cartes mobiles */}
+            {/* Cartes mobiles (portrait) */}
             <div className="grid gap-3 sm:hidden">
               {precommandes.map((p) => (
-                <div key={p.id} className="rounded-lg border p-3 bg-white">
+                <div key={p.id} className="rounded-lg border p-3 bg-card">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="font-medium text-base">{p.id}</div>
@@ -84,28 +122,29 @@ export default function Precommandes() {
               ))}
             </div>
 
-            {/* Table ≥ sm */}
-            <div className="hidden sm:block overflow-x-auto -mx-4 sm:mx-0">
-              <Table className="min-w-[900px]">
+            {/* Table ≥ sm : scroll horizontal propre (mobile paysage) + centrage desktop */}
+            <div className="hidden sm:block overflow-x-auto ls-tablewrap desk-tablewrap">
+              <Table className="min-w-[860px] whitespace-nowrap">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Acteur</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Produit</TableHead>
-                    <TableHead>Quantité</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="w-[10%]">Code</TableHead>
+                    <TableHead className="w-[20%]">Acteur</TableHead>
+                    <TableHead className="w-[12%]">Type</TableHead>
+                    <TableHead className="w-[18%]">Produit</TableHead>
+                    <TableHead className="w-[10%]">Quantité</TableHead>
+                    <TableHead className="w-[14%]">Statut</TableHead>
+                    <TableHead className="w-[10%]">Date</TableHead>
+                    <TableHead className="w-[6%] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   {precommandes.map((p) => (
                     <TableRow key={p.id}>
                       <TableCell className="font-medium">{p.id}</TableCell>
-                      <TableCell>{p.acteur}</TableCell>
+                      <TableCell className="max-w-[260px] truncate" title={p.acteur}>{p.acteur}</TableCell>
                       <TableCell><TypeBadge type={p.type} /></TableCell>
-                      <TableCell>{p.produit}</TableCell>
+                      <TableCell className="max-w-[260px] truncate" title={p.produit}>{p.produit}</TableCell>
                       <TableCell>{p.quantite}</TableCell>
                       <TableCell><StatusBadge status={p.statut} /></TableCell>
                       <TableCell>{p.date}</TableCell>
